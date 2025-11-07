@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - AWS_REGION=us-east-1
+      - TXTAI_INDEX_PATH=/app/txtai_index
+      - TXTAI_MODEL=sentence-transformers/all-MiniLM-L6-v2
+      - BEDROCK_MODEL_ID=anthropic.claude-v2
+      - TOP_K_RESULTS=5
+    volumes:
+      - ./backend/txtai_index:/app/txtai_index
+      - ~/.aws:/root/.aws:ro  # Mount AWS credentials
+    env_file:
+      - ./backend/.env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    environment:
+      - VITE_API_URL=http://localhost:8000
+    depends_on:
+      - backend
+

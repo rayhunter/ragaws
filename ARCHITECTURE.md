@@ -1,0 +1,8 @@
+ReactJS (frontend)
+   ↓ (REST/GraphQL)
+FastAPI backend (RAG Orchestrator)
+   ├── txtai (embeddings + semantic search)
+   ├── AWS S3 (document storage)
+   ├── AWS Lambda (ingestion preprocessing)
+   ├── AWS RDS / DynamoDB (metadata)
+   └── LLM (local or hosted — e.g. Bedrock or Ollama)
