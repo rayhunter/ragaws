@@ -4,11 +4,12 @@
   "requiresCompatibilities": ["FARGATE"],
   "cpu": "256",
   "memory": "512",
-  "executionRoleArn": "arn:aws:iam::YOUR_ACCOUNT_ID:role/ecsTaskExecutionRole",
+  "executionRoleArn": "arn:aws:iam::076656108307:role/ecsTaskExecutionRole",
+  "taskRoleArn": "arn:aws:iam::076656108307:role/ecsTaskRole",
   "containerDefinitions": [
     {
       "name": "txtai-rag-frontend",
-      "image": "YOUR_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/txtai-rag-frontend:latest",
+      "image": "076656108307.dkr.ecr.us-east-1.amazonaws.com/txtai-rag-frontend:latest",
       "essential": true,
       "portMappings": [
         {

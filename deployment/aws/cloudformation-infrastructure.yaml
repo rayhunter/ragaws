@@ -49,8 +49,7 @@ Resources:
           Value: !Ref Environment
       Encrypted: true
       PerformanceMode: generalPurpose
-      ThroughputMode: provisioned
-      ProvisionedThroughputMibps: 100
+      ThroughputMode: bursting
 
   EFSAccessPoint:
     Type: AWS::EFS::AccessPoint
@@ -105,10 +104,6 @@ Resources:
           FromPort: 8000
           ToPort: 8000
           SourceSecurityGroupId: !Ref ALBSecurityGroup
-        - IpProtocol: tcp
-          FromPort: 2049
-          ToPort: 2049
-          SourceSecurityGroupId: !Ref EFSSecurityGroup
       SecurityGroupEgress:
         - IpProtocol: -1
           CidrIp: 0.0.0.0/0

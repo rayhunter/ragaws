@@ -1,7 +1,8 @@
 """
 Document processing utilities for PDF and Markdown files.
 """
-import fitz  # PyMuPDF
+from io import BytesIO
+from pypdf import PdfReader
 import markdown2
 import logging
 from typing import List, Dict, Any
@@ -26,14 +27,14 @@ class DocumentProcessor:
             Extracted text
         """
         try:
-            doc = fitz.open(stream=file_content, filetype="pdf")
+            pdf_file = BytesIO(file_content)
+            reader = PdfReader(pdf_file)
             text_parts = []
             
-            for page_num, page in enumerate(doc):
-                text = page.get_text()
+            for page_num, page in enumerate(reader.pages):
+                text = page.extract_text()
                 text_parts.append(text)
             
-            doc.close()
             full_text = "\n\n".join(text_parts)
             
             logger.info(f"Extracted {len(full_text)} characters from PDF: {filename}")

@@ -4,12 +4,12 @@
   "requiresCompatibilities": ["FARGATE"],
   "cpu": "2048",
   "memory": "4096",
-  "executionRoleArn": "arn:aws:iam::YOUR_ACCOUNT_ID:role/ecsTaskExecutionRole",
-  "taskRoleArn": "arn:aws:iam::YOUR_ACCOUNT_ID:role/ecsTaskRole",
+  "executionRoleArn": "arn:aws:iam::076656108307:role/ecsTaskExecutionRole",
+  "taskRoleArn": "arn:aws:iam::076656108307:role/ecsTaskRole",
   "containerDefinitions": [
     {
       "name": "txtai-rag-backend",
-      "image": "YOUR_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/txtai-rag-backend:latest",
+      "image": "076656108307.dkr.ecr.us-east-1.amazonaws.com/txtai-rag-backend:latest",
       "essential": true,
       "portMappings": [
         {
@@ -21,6 +21,14 @@
         {
           "name": "AWS_REGION",
           "value": "us-east-1"
+        },
+        {
+          "name": "AWS_S3_BUCKET",
+          "value": "ragaws-documents-076656108307"
+        },
+        {
+          "name": "AWS_DYNAMODB_TABLE",
+          "value": "rag-metadata"
         },
         {
           "name": "TXTAI_INDEX_PATH",
@@ -70,11 +78,11 @@
     {
       "name": "txtai-index",
       "efsVolumeConfiguration": {
-        "fileSystemId": "YOUR_EFS_FILE_SYSTEM_ID",
+        "fileSystemId": "fs-0e0f887e5d38f643c",
         "rootDirectory": "/",
         "transitEncryption": "ENABLED",
         "authorizationConfig": {
-          "accessPointId": "YOUR_EFS_ACCESS_POINT_ID",
+          "accessPointId": "fsap-054d2107160eaf5ea",
           "iam": "ENABLED"
         }
       }

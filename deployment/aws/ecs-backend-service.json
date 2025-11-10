@@ -18,7 +18,7 @@
   },
   "loadBalancers": [
     {
-      "targetGroupArn": "arn:aws:elasticloadbalancing:us-east-1:YOUR_ACCOUNT_ID:targetgroup/txtai-backend-tg/xxxxxxxxx",
+      "targetGroupArn": "arn:aws:elasticloadbalancing:us-east-1:076656108307:targetgroup/txtai-backend-tg/xxxxxxxxx",
       "containerName": "txtai-rag-backend",
       "containerPort": 8000
     }
