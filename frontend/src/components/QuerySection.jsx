@@ -1,6 +1,6 @@
 import React from 'react'
 
-function QuerySection({ query, setQuery, onQuery, isLoading }) {
+function QuerySection({ query, setQuery, onQuery, isLoading, apiUrl }) {
   const handleSubmit = (e) => {
     e.preventDefault()
     onQuery()
@@ -9,6 +9,11 @@ function QuerySection({ query, setQuery, onQuery, isLoading }) {
   return (
     <div className="mb-8 p-6 bg-gray-900 rounded-lg border border-gray-800">
       <h2 className="text-xl font-semibold mb-4">Query</h2>
+      {apiUrl && (
+        <p className="text-xs text-gray-500 mb-4">
+          Requests are sent to <span className="font-mono text-gray-300">{apiUrl}</span>
+        </p>
+      )}
       
       <form onSubmit={handleSubmit} className="flex gap-4">
         <div className="flex-1">
@@ -34,4 +39,3 @@ function QuerySection({ query, setQuery, onQuery, isLoading }) {
 }
 
 export default QuerySection
-

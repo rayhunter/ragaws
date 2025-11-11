@@ -93,7 +93,7 @@ Before deploying, update these placeholders in the task definition files:
 
 2. **ecs-frontend-task-definition.json**:
    - Replace `YOUR_ACCOUNT_ID` with your AWS account ID
-   - Update `VITE_API_URL` with your API Gateway or ALB URL
+   - Update `VITE_API_URL` with your API Gateway or ALB URL (or provide it via `FRONTEND_API_URL` when building)
 
 3. **ecs-backend-service.json** and **ecs-frontend-service.json**:
    - Update subnet IDs
@@ -135,6 +135,8 @@ aws elbv2 create-target-group \
 ```bash
 # Set your AWS account ID
 export AWS_ACCOUNT_ID=123456789012
+# Point the frontend build to your public backend endpoint
+export FRONTEND_API_URL=https://api.example.com
 
 # Run deployment script
 cd deployment/aws
@@ -217,4 +219,3 @@ aws application-autoscaling put-scaling-policy \
 - Set up CloudWatch alarms for cost monitoring
 - Configure EFS lifecycle policies for old indexes
 - Use S3 Intelligent-Tiering for document storage
-

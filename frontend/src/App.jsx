@@ -1,22 +1,39 @@
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import axios from 'axios'
 import UploadSection from './components/UploadSection'
 import QuerySection from './components/QuerySection'
 import ResultsSection from './components/ResultsSection'
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
-
 function App() {
   const [query, setQuery] = useState('')
   const [retrievedContext, setRetrievedContext] = useState(null)
   const [answer, setAnswer] = useState(null)
+  const [errorMessage, setErrorMessage] = useState(null)
   const queryClient = useQueryClient()
+
+  const apiUrl = useMemo(() => {
+    if (import.meta.env.VITE_API_URL) {
+      return import.meta.env.VITE_API_URL
+    }
+    if (window.__RAG_API_URL__) {
+      return window.__RAG_API_URL__
+    }
+    return window.location.origin
+  }, [])
+
+  const axiosInstance = useMemo(() => {
+    const instance = axios.create({
+      baseURL: apiUrl,
+      timeout: 30_000,
+    })
+    return instance
+  }, [apiUrl])
 
   // Retrieve context
   const retrieveMutation = useMutation({
     mutationFn: async (question) => {
-      const response = await axios.post(`${API_URL}/api/v1/retrieval/query`, {
+      const response = await axiosInstance.post('/api/v1/retrieval/query', {
         question,
         top_k: 5
       })
@@ -24,13 +41,17 @@ function App() {
     },
     onSuccess: (data) => {
       setRetrievedContext(data)
+      setErrorMessage(null)
+    },
+    onError: (error) => {
+      setErrorMessage(error.response?.data?.detail || 'Failed to retrieve context from the API.')
     }
   })
 
   // Generate answer
   const generateMutation = useMutation({
     mutationFn: async ({ context, question }) => {
-      const response = await axios.post(`${API_URL}/api/v1/generation/generate`, {
+      const response = await axiosInstance.post('/api/v1/generation/generate', {
         context,
         question,
         max_tokens: 2048,
@@ -40,6 +61,10 @@ function App() {
     },
     onSuccess: (data) => {
       setAnswer(data)
+      setErrorMessage(null)
+    },
+    onError: (error) => {
+      setErrorMessage(error.response?.data?.detail || 'Failed to generate an answer.')
     }
   })
 
@@ -49,7 +74,10 @@ function App() {
 
     // Step 1: Retrieve context
     const retrievalResult = await retrieveMutation.mutateAsync(query)
-    
+    if (!retrievalResult?.context) {
+      return
+    }
+
     // Step 2: Generate answer with retrieved context
     await generateMutation.mutateAsync({
       context: retrievalResult.context,
@@ -61,7 +89,7 @@ function App() {
   const { data: stats } = useQuery({
     queryKey: ['stats'],
     queryFn: async () => {
-      const response = await axios.get(`${API_URL}/api/v1/ingestion/stats`)
+      const response = await axiosInstance.get('/api/v1/ingestion/stats')
       return response.data
     },
     refetchInterval: 30000 // Refresh every 30 seconds
@@ -92,7 +120,16 @@ function App() {
           setQuery={setQuery}
           onQuery={handleQuery}
           isLoading={retrieveMutation.isPending || generateMutation.isPending}
+          apiUrl={apiUrl}
         />
+
+        {errorMessage && (
+          <div className="mb-6 p-4 bg-red-900 text-red-100 rounded-lg border border-red-700">
+            <p className="text-sm font-semibold">Request error</p>
+            <p className="text-sm mt-1">{errorMessage}</p>
+            <p className="text-xs text-red-200 mt-3">Using API endpoint: {apiUrl}</p>
+          </div>
+        )}
 
         {/* Results Section */}
         <ResultsSection
@@ -106,4 +143,3 @@ function App() {
 }
 
 export default App
-

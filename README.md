@@ -100,6 +100,9 @@ cd deployment/aws
 ### 3. Deploy Services
 
 ```bash
+# Ensure the frontend build knows where to reach the backend
+export FRONTEND_API_URL=https://api.example.com
+
 ./deploy.sh
 ```
 
@@ -208,4 +211,3 @@ MIT
 ## 📧 Support
 
 For issues and questions, please open a GitHub issue.
-

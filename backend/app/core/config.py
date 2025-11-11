@@ -1,14 +1,19 @@
 """
 Application configuration settings.
 """
-from pydantic_settings import BaseSettings
+import json
 from typing import List
+
+from pydantic import Field, field_validator
+from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
     # API Settings
     API_V1_PREFIX: str = "/api/v1"
-    CORS_ORIGINS: List[str] = ["http://localhost:5173", "http://localhost:3000"]
+    CORS_ORIGINS: List[str] = Field(
+        default_factory=lambda: ["http://localhost:5173", "http://localhost:3000"]
+    )
     
     # txtai Settings
     TXTAI_INDEX_PATH: str = "/mnt/efs/txtai_index"
@@ -28,6 +33,29 @@ class Settings(BaseSettings):
     
     # Retrieval Settings
     TOP_K_RESULTS: int = 5
+
+    @field_validator("CORS_ORIGINS", mode="before")
+    @classmethod
+    def parse_cors_origins(cls, value):
+        """
+        Allow environment variables to provide CORS origins as a JSON array or
+        comma-separated string.
+        """
+        if isinstance(value, list):
+            return value
+        if isinstance(value, str):
+            value = value.strip()
+            if not value:
+                return []
+            if value.startswith("[") and value.endswith("]"):
+                try:
+                    parsed = json.loads(value)
+                    if isinstance(parsed, list):
+                        return parsed
+                except json.JSONDecodeError as exc:
+                    raise ValueError("Invalid JSON for CORS_ORIGINS") from exc
+            return [origin.strip() for origin in value.split(",") if origin.strip()]
+        return value
     
     class Config:
         env_file = ".env"
@@ -35,4 +63,3 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
-

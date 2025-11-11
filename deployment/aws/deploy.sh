@@ -10,8 +10,15 @@ AWS_PROFILE=${AWS_PROFILE:-rays-admin-profile}
 ECR_BACKEND_REPO=txtai-rag-backend
 ECR_FRONTEND_REPO=txtai-rag-frontend
 ECS_CLUSTER=txtai-rag-cluster
+FRONTEND_API_URL=${FRONTEND_API_URL:-}
 
 echo "🚀 Starting deployment..."
+
+if [ -z "${FRONTEND_API_URL}" ]; then
+  echo "❌ FRONTEND_API_URL environment variable is not set."
+  echo "   Set it to the publicly reachable backend URL (e.g. https://api.example.com) before deploying."
+  exit 1
+fi
 
 # Step 1: Build and push backend Docker image
 echo "📦 Building backend Docker image..."
@@ -27,7 +34,9 @@ cd ..
 # Step 2: Build and push frontend Docker image
 echo "📦 Building frontend Docker image..."
 cd frontend
-docker build -t ${ECR_FRONTEND_REPO}:latest .
+docker build \
+  --build-arg VITE_API_URL=${FRONTEND_API_URL} \
+  -t ${ECR_FRONTEND_REPO}:latest .
 docker tag ${ECR_FRONTEND_REPO}:latest ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_FRONTEND_REPO}:latest
 
 echo "📤 Pushing frontend image to ECR..."
@@ -71,4 +80,3 @@ aws ecs update-service \
 echo "✅ Deployment complete!"
 echo "📊 Monitor deployment status:"
 echo "   aws ecs describe-services --cluster ${ECS_CLUSTER} --services txtai-rag-backend-service txtai-rag-frontend-service --region ${AWS_REGION} --profile ${AWS_PROFILE}"
-
