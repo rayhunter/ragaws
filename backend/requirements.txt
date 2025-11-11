@@ -9,6 +9,9 @@ pydantic-settings==2.1.0
 python-dotenv==1.0.0
 
 # Vector Search & ML
+# NOTE: txtai requires torch, which doesn't support Python 3.13 yet
+# Use Python 3.11 or 3.12 for this project
+numpy<2.0  # Required for torch compatibility
 txtai==6.0.0
 huggingface_hub==0.19.4
 
@@ -19,4 +22,3 @@ markdown2==2.4.10
 # AWS Services
 boto3==1.29.7
 botocore==1.32.7
-

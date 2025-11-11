@@ -16,7 +16,7 @@ class Settings(BaseSettings):
     )
     
     # txtai Settings
-    TXTAI_INDEX_PATH: str = "/mnt/efs/txtai_index"
+    TXTAI_INDEX_PATH: str = "./data/txtai_index"  # Use local path by default, override with env var for AWS EFS
     TXTAI_MODEL: str = "sentence-transformers/all-MiniLM-L6-v2"
     CHUNK_SIZE: int = 500
     CHUNK_OVERLAP: int = 100
